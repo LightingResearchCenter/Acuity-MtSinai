@@ -11,6 +11,14 @@ ax = axes(f);
 loop1 = true;
 while loop1
     plot(ax,obj.Time,[obj.ActivityIndex,obj.CircadianStimulus])
+    ax.XLimMode = 'manual';
+    ax.YLimMode = 'manual';
+    ax.YLim = [0,max(obj.CircadianStimulus)];
+    if verLessThan('matlab','R2016b')
+        ax.XLim = [floor(min(datenum(obj.Time))),ceil(max(datenum(obj.Time)))];
+    else
+        ax.XLim = [dateshift(min(obj.Time),'start','day'),dateshift(max(obj.Time),'end','day')];
+    end
     title(ax,obj.ID,'Interpreter','none')
     legend(ax,'AI','CS')
     
@@ -35,6 +43,14 @@ while loop1
     end
     
     plot(ax,obj.Time(idx),[obj.ActivityIndex(idx),obj.CircadianStimulus(idx)])
+    ax.XLimMode = 'manual';
+    ax.YLimMode = 'manual';
+    ax.YLim = [0,1];
+    if verLessThan('matlab','R2016b')
+        ax.XLim = [floor(min(datenum(obj.Time(idx)))),ceil(max(datenum(obj.Time(idx))))];
+    else
+        ax.XLim = [dateshift(min(obj.Time(idx)),'start','day'),dateshift(max(obj.Time(idx)),'end','day')];
+    end
     title(ax,obj.ID,'Interpreter','none')
     legend(ax,'AI','CS')
     
@@ -207,11 +223,14 @@ display('Press SPACE BAR to continue');
 ax.Parent.CurrentCharacter = 'z';
 waitfor(ax.Parent,'CurrentCharacter',char(32));
 zoom(ax,'off')
-[x,y] = ginput(1);
+[x1,y1] = ginput(1);
 
 if ~verLessThan('matlab','R2016b')
-    x = x + x0;
-    y = y + y0;
+    x = x1 + x0;
+    y = y1 + y0;
+else
+    x = x1;
+    y = y1;
 end
 
 zoom(ax,'out')

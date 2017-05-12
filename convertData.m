@@ -1,4 +1,4 @@
-function dbPath = CropAndConvert
+function dbPath = convertData
 
 %% Reset MATLAB
 close all
@@ -17,7 +17,7 @@ calPath = fullfile(rootDir,'DaysimeterAndDimesimeterReferenceFiles',...
     'recalibration2016','calibration_log.csv');
 prjDir  = fullfile(rootDir,'Acuity_MtSinai');
 dbName  = [timestamp,'.mat'];
-dbDir = fullfile(prjDir,'CroppedData');
+dbDir = fullfile(prjDir,'convertedData');
 dbPath  = fullfile(dbDir,dbName);
 
 % Check for previous DB
@@ -49,7 +49,7 @@ T3FixtureDirs = fullfile(subjectDirs,'T3','fixture');
 T3BedDirs = fullfile(subjectDirs,'T3','bed');
 
 %% Create DB file and object
-DB = matfile(dbPath,'Writable',true);
+% DB = matfile(dbPath,'Writable',true);
 
 
 n = numel(IDs);
@@ -75,21 +75,18 @@ for iSub = 1:n
     thisDataDir = T1PersonDirs{iSub};
     
     % Convert data
-    thisObj = convertData(thisID,thisDataDir,'T1','HumanData',calPath,thisDiaryDir);
+    thisObj = files2obj(thisID,thisDataDir,'T1','HumanData',calPath,thisDiaryDir);
     
     if isempty(thisObj)
         continue
     end
     
-    % Crop the data
-    thisObj = crop(thisObj);
-    
     T1Person(ii,1) = thisObj;
-    DB.T1Person = T1Person;
     ii = ii + 1;
 end
 
-%% Crop and convert T3 data
+
+%% Convert T3 data
 if ~isempty(previousDB)
     T3Person = previousDB.T3Person;
     T3Fixture = previousDB.T3Fixture;
@@ -97,7 +94,9 @@ if ~isempty(previousDB)
     ii = numel(T1Person) + 1;
     previousIDs = {previousDB.T3Person.ID}';
 else
-    ii = 1;
+    iP = 1;
+    iF = 1;
+    iB = 1;
     previousIDs = {''};
 end
 
@@ -114,36 +113,48 @@ for iSub = 1:n
     thisBedDir     = T3BedDirs{iSub};
     
     % Convert data
-    thisPerson  = convertData(thisID,thisPersonDir,'T3','HumanData',calPath,thisDiaryDir);
-    thisFixture = convertData([thisID,'-fixture'],thisFixtureDir,'T3','HumanData',calPath,thisDiaryDir);
-    thisBed     = convertData([thisID,'-bed'],thisBedDir,'T3','HumanData',calPath,thisDiaryDir);
+    thisPerson  = files2obj(thisID,thisPersonDir,'T3','HumanData',calPath,thisDiaryDir);
+    thisFixture = files2obj([thisID,'-fixture'],thisFixtureDir,'T3','HumanData',calPath,thisDiaryDir);
+    thisBed     = files2obj([thisID,'-bed'],thisBedDir,'T3','HumanData',calPath,thisDiaryDir);
     
-    if isempty(thisPerson)
-        continue
+    if ~isempty(thisPerson)
+        T3Person(iP,1) = thisPerson;
+        iP = iP + 1;
     end
     
-    % Crop the data
-    thisPerson = crop(thisPerson);
-    t1 = min(thisPerson.Time(thisPerson.Observation));
-    t2 = max(thisPerson.Time(thisPerson.Observation));
-    thisFixture.Observation = thisFixture.Time >= t1 & thisFixture.Time <= t2;
-    thisBed.Observation = thisBed.Time >= t1 & thisBed.Time <= t2;
+    if ~isempty(thisFixture)
+        T3Fixture(iF,1) = thisFixture;
+        iF = iF + 1;
+    end
     
-    T3Person(ii,1) = thisPerson;
-    DB.T3Person = T3Person;
+    if ~isempty(thisBed)
+        T3Bed(iB,1) = thisBed;
+        iB = iB + 1;
+    end
     
-    T3Fixture(ii,1) = thisFixture;
-    DB.T3Fixture = T3Fixture;
     
-    T3Bed(ii,1) = thisBed;
-    DB.T3Bed = T3Bed;
-    
-    ii = ii + 1;
 end
+
+dbT1pName  = [timestamp,'-T1-person.mat'];
+dbT1pPath  = fullfile(dbDir,dbT1pName);
+save(dbT1pPath,'T1Person');
+
+dbT3pName  = [timestamp,'-T3-person.mat'];
+dbT3pPath  = fullfile(dbDir,dbT3pName);
+save(dbT3pPath,'T3Person');
+
+dbT3bName  = [timestamp,'-T3-bed.mat'];
+dbT3bPath  = fullfile(dbDir,dbT3bName);
+save(dbT3bPath,'T3Bed');
+
+dbT3fName  = [timestamp,'-T3-fixture.mat'];
+dbT3fPath  = fullfile(dbDir,dbT3fName);
+save(dbT3fPath,'T3Fixture');
+
 
 end
 
-function obj = convertData(ID,dataDir,session,objType,calPath,varargin)
+function obj = files2obj(ID,dataDir,session,objType,calPath,varargin)
 tz = 'America/New_York';
 
 logListing   = dir(fullfile(dataDir,'*-LOG.txt'));
