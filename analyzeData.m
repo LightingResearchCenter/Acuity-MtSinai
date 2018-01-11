@@ -7,9 +7,9 @@ timestamp = datestr(now,'yyyy-mm-dd HH-MM');
 d12packDir = fullfile(githubDir,'d12pack');
 addpath(d12packDir);
 
-% projectDir = '\\ROOT\projects\GSA_Daysimeter\Federal_Highway\DaysimeterData';
-projectDir = '/Users/geoff/Desktop/Acuity MtSinai';
-dataDir = fullfile(projectDir,'CroppedData');
+projectDir = '\\root\projects\Acuity_MtSinai';
+% projectDir = '/Users/geoff/Desktop/Acuity MtSinai';
+dataDir = fullfile(projectDir,'croppedData');
 saveDir = fullfile(projectDir,'tables');
 
 ls = dir([dataDir,filesep,'*.mat']);
@@ -34,7 +34,11 @@ for iFile = 1:numel(ls)
         
         obj = objArray(iObj);
         
-        idxKeep = obj.Observation & obj.Compliance & ~obj.Error & ~obj.InBed;
+        if isa(obj,'d12pack.HumanData')
+            idxKeep = obj.Observation & obj.Compliance & ~obj.Error & ~obj.InBed;
+        else
+            idxKeep = obj.Observation & ~obj.Error;
+        end
         
         t = obj.Time(idxKeep);
         ai = obj.ActivityIndex(idxKeep);
@@ -93,9 +97,9 @@ for iFile = 1:numel(ls)
         
         sheet = obj.ID;
         
-        aiName = [saveName,' Mean AI','.xlsx'];
-        aiPath = fullfile(saveDir,aiName);
-        writetable(aiTB,aiPath,'Sheet',sheet,'WriteVariableNames',true,'WriteRowNames',true);
+%         aiName = [saveName,' Mean AI','.xlsx'];
+%         aiPath = fullfile(saveDir,aiName);
+%         writetable(aiTB,aiPath,'Sheet',sheet,'WriteVariableNames',true,'WriteRowNames',true);
         
 %         luxName = [saveName,' Mean Lux','.xlsx'];
 %         luxPath = fullfile(saveDir,luxName);
@@ -109,9 +113,9 @@ for iFile = 1:numel(ls)
         csPath = fullfile(saveDir,csName);
         writetable(csTB,csPath,'Sheet',sheet,'WriteVariableNames',true,'WriteRowNames',true);
         
-        coverageName = [saveName,' Analysis Coverage','.xlsx'];
-        coveragePath = fullfile(saveDir,coverageName);
-        writetable(coverageTB,coveragePath,'Sheet',sheet,'WriteVariableNames',true,'WriteRowNames',true);
+%         coverageName = [saveName,' Analysis Coverage','.xlsx'];
+%         coveragePath = fullfile(saveDir,coverageName);
+%         writetable(coverageTB,coveragePath,'Sheet',sheet,'WriteVariableNames',true,'WriteRowNames',true);
         
         waitbar(iObj/nObj);
     end

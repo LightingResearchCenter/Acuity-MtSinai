@@ -1,4 +1,4 @@
-function dbPath = convertData
+function convertData
 
 %% Reset MATLAB
 close all
@@ -20,17 +20,6 @@ dbName  = [timestamp,'.mat'];
 dbDir = fullfile(prjDir,'convertedData');
 dbPath  = fullfile(dbDir,dbName);
 
-% Check for previous DB
-dbListing = dir(fullfile(dbDir,'*.mat'));
-if ~isempty(dbListing)
-    [~,idxMostRecent] = max(vertcat(dbListing.datenum));
-    previousDbName = dbListing(idxMostRecent).name;
-    previousDbPath = fullfile(dbDir,previousDbName);
-    previousDB = load(previousDbPath);
-else
-    previousDB = [];
-end
-
 % Map subject folders
 subjectListing = dir(prjDir);
 isSubject = ~cellfun(@isempty,regexp({subjectListing.name}','^\d{3}$'));
@@ -48,28 +37,13 @@ T3PersonDirs = fullfile(subjectDirs,'T3','person');
 T3FixtureDirs = fullfile(subjectDirs,'T3','fixture');
 T3BedDirs = fullfile(subjectDirs,'T3','bed');
 
-%% Create DB file and object
-% DB = matfile(dbPath,'Writable',true);
-
-
 n = numel(IDs);
 
 %% Crop and convert T1 PERSON data
-if ~isempty(previousDB)
-    T1Person = previousDB.T1Person;
-    ii = numel(T1Person) + 1;
-    previousIDs = {previousDB.T1Person.ID}';
-else
-    ii = 1;
-    previousIDs = {''};
-end
+ii = 1;
 
 for iSub = 1:n
     thisID = IDs{iSub};
-    
-    if any(strcmp(thisID,previousIDs))
-        continue
-    end
     
     thisDiaryDir = T1DiaryDirs{iSub};
     thisDataDir = T1PersonDirs{iSub};
@@ -87,25 +61,12 @@ end
 
 
 %% Convert T3 data
-if ~isempty(previousDB)
-    T3Person = previousDB.T3Person;
-    T3Fixture = previousDB.T3Fixture;
-    T3Bed = previousDB.T3Bed;
-    ii = numel(T1Person) + 1;
-    previousIDs = {previousDB.T3Person.ID}';
-else
-    iP = 1;
-    iF = 1;
-    iB = 1;
-    previousIDs = {''};
-end
+iP = 1;
+iF = 1;
+iB = 1;
 
 for iSub = 1:n
     thisID = IDs{iSub};
-    
-    if any(strcmp(thisID,previousIDs))
-        continue
-    end
     
     thisDiaryDir   = T3DiaryDirs{iSub};
     thisPersonDir  = T3PersonDirs{iSub};
@@ -114,8 +75,8 @@ for iSub = 1:n
     
     % Convert data
     thisPerson  = files2obj(thisID,thisPersonDir,'T3','HumanData',calPath,thisDiaryDir);
-    thisFixture = files2obj([thisID,'-fixture'],thisFixtureDir,'T3','HumanData',calPath,thisDiaryDir);
-    thisBed     = files2obj([thisID,'-bed'],thisBedDir,'T3','HumanData',calPath,thisDiaryDir);
+    thisFixture = files2obj([thisID,'-fixture'],thisFixtureDir,'T3','StaticData',calPath);
+    thisBed     = files2obj([thisID,'-bed'],thisBedDir,'T3','StaticData',calPath);
     
     if ~isempty(thisPerson)
         T3Person(iP,1) = thisPerson;
