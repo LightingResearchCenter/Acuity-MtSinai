@@ -97,25 +97,25 @@ for iFile = 1:numel(ls)
         
         sheet = obj.ID;
         
-%         aiName = [saveName,' Mean AI','.xlsx'];
-%         aiPath = fullfile(saveDir,aiName);
-%         writetable(aiTB,aiPath,'Sheet',sheet,'WriteVariableNames',true,'WriteRowNames',true);
+        aiName = [saveName,' Mean AI','.xlsx'];
+        aiPath = fullfile(saveDir,aiName);
+        writetable(aiTB,aiPath,'Sheet',sheet,'WriteVariableNames',true,'WriteRowNames',true);
         
-%         luxName = [saveName,' Mean Lux','.xlsx'];
-%         luxPath = fullfile(saveDir,luxName);
-%         writetable(luxTB,luxPath,'Sheet',sheet,'WriteVariableNames',true,'WriteRowNames',true);
+        luxName = [saveName,' Mean Lux','.xlsx'];
+        luxPath = fullfile(saveDir,luxName);
+        writetable(luxTB,luxPath,'Sheet',sheet,'WriteVariableNames',true,'WriteRowNames',true);
         
-%         claName = [saveName,' Mean CLA','.xlsx'];
-%         claPath = fullfile(saveDir,claName);
-%         writetable(claTB,claPath,'Sheet',sheet,'WriteVariableNames',true,'WriteRowNames',true);
+        claName = [saveName,' Mean CLA','.xlsx'];
+        claPath = fullfile(saveDir,claName);
+        writetable(claTB,claPath,'Sheet',sheet,'WriteVariableNames',true,'WriteRowNames',true);
         
         csName = [saveName,' Mean CS','.xlsx'];
         csPath = fullfile(saveDir,csName);
         writetable(csTB,csPath,'Sheet',sheet,'WriteVariableNames',true,'WriteRowNames',true);
         
-%         coverageName = [saveName,' Analysis Coverage','.xlsx'];
-%         coveragePath = fullfile(saveDir,coverageName);
-%         writetable(coverageTB,coveragePath,'Sheet',sheet,'WriteVariableNames',true,'WriteRowNames',true);
+        coverageName = [saveName,' Analysis Coverage','.xlsx'];
+        coveragePath = fullfile(saveDir,coverageName);
+        writetable(coverageTB,coveragePath,'Sheet',sheet,'WriteVariableNames',true,'WriteRowNames',true);
         
         waitbar(iObj/nObj);
     end
