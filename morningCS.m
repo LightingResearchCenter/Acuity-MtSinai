@@ -1,4 +1,4 @@
-function summarizeCS
+function morningCS
 %SUMMARIZECS Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -37,9 +37,8 @@ idxT3 = cellfun(@any,regexp({cropLS.name}','T3','ignorecase'));
 dataLS = cropLS(idxT3);
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-dwlGroup = {'401', '404', '406', '413', '415', '420', '423', '425', '426', '427', '428', '432', '433'}';
-bwlGroup = {'402', '407', '409', '411', '414', '417', '418', '422', '424', '429', '434', '435', '436'};
-
+dwlGroup = {'401', '404', '406', '413', '415', '420', '423', '425', '426', '427', '428', '432', '433', '437', '441', '442', '445', '451', '453', '454', '457'}';
+bwlGroup = {'402', '407', '409', '411', '414', '417', '418', '422', '424', '429', '434', '435', '436', '443', '444', '446', '448', '449', '452', '456'};
 for iFile = 1:numel(dataLS)
     dataName = dataLS(iFile).name;
     dataPath = fullfile(dataDir,dataName);
