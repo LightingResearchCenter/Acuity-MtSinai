@@ -2,77 +2,46 @@ function MakeComposites
 %MAKE Summary of this function goes here
 %   Detailed explanation goes here
 
-addpath('C:\Users\jonesg5\Documents\GitHub\d12pack');
+timestamp = datestr(now,'yyyy-mm-dd HH-MM');
+
+% Enable dependencies
+[githubDir,~,~] = fileparts(pwd);
+d12packDir      = fullfile(githubDir,'d12pack');
+addpath(d12packDir);
 
 projectDir = '\\root\projects\Acuity_MtSinai';
+dataDir = fullfile(projectDir,'croppedData');
+saveDir = fullfile(projectDir,'composites');
 
-dataDir = fullfile(projectDir,'CroppedData');
+ls = dir([dataDir,filesep,'*.mat']);
 
-ls = dir(fullfile(dataDir,'*.mat'));
-[~,idxMostRecent] = max(vertcat(ls.datenum));
-dataName = ls(idxMostRecent).name;
-dataPath = fullfile(dataDir,dataName);
-
-exportDir = fullfile(projectDir,'Composites');
-
-DataCluster = load(dataPath);
-
-timestamp = upper(datestr(now,'mmmdd'));
-
-objArray = DataCluster.T1Person;
-for iObj = 1:numel(objArray)
-    thisObj = objArray(iObj);
+for iFile = 1:numel(ls)
+    dataName = ls(iFile).name;
+    dataPath = fullfile(dataDir,dataName);
+    load(dataPath);
     
-    if isempty(thisObj.Time)
-        continue
-    end
-    
-    titleText = {'Acuity - Mt Sinai';['ID: ',thisObj.ID,', Session: ',thisObj.Session.Name,', Device SN: ',num2str(thisObj.SerialNumber)]};
-    
-%     try
-        d = d12pack.composite(thisObj,titleText);
-%     catch err
-%         close all
-%         continue
-%     end
-    
-    for iFile = 1:numel(d)
+    for iObj = 1:numel(objArray)
+        thisObj = objArray(iObj);
         
-        fileName = [thisObj.ID,'_',thisObj.Session.Name,'_',timestamp,'_p',num2str(iFile),'.pdf'];
-        filePath = fullfile(exportDir,fileName);
-        saveas(d(iFile).Figure,filePath);
-        close(d(iFile).Figure);
-        
+        switch class(thisObj)
+            case {'d12pack.HumanData', 'd12pack.MobileData'}
+                if isempty(thisObj.Time)
+                    continue
+                end
+                
+                titleText = {'Acuity - Mt Sinai';['ID: ',thisObj.ID,', Session: ',thisObj.Session.Name,', Device SN: ',num2str(thisObj.SerialNumber)]};
+                
+                c = d12pack.composite(thisObj,titleText);
+                c.Title = titleText;
+                
+                fileName = [thisObj.ID,'_',thisObj.Session.Name,'_',timestamp,'.pdf'];
+                filePath = fullfile(saveDir,fileName);
+                saveas(c.Figure,filePath);
+                close(c.Figure);
+        end
     end
 end
 
-
-objArray = DataCluster.T3Person;
-for iObj = 1:numel(objArray)
-    thisObj = objArray(iObj);
-    
-    if isempty(thisObj.Time)
-        continue
-    end
-    
-    titleText = {'Acuity - Mt Sinai';['ID: ',thisObj.ID,', Session: ',thisObj.Session.Name,', Device SN: ',num2str(thisObj.SerialNumber)]};
-    
-%     try
-        d = d12pack.composite(thisObj,titleText);
-%     catch err
-%         close all
-%         continue
-%     end
-    
-    for iFile = 1:numel(d)
-        
-        fileName = [thisObj.ID,'_',thisObj.Session.Name,'_',timestamp,'_p',num2str(iFile),'.pdf'];
-        filePath = fullfile(exportDir,fileName);
-        saveas(d(iFile).Figure,filePath);
-        close(d(iFile).Figure);
-        
-    end
-end
 
 end
 

@@ -1,112 +1,48 @@
 function MakeDaysigrams
 %MAKE Summary of this function goes here
 %   Detailed explanation goes here
+timestamp = datestr(now,'yyyy-mm-dd HH-MM');
 
-addpath('C:\Users\jonesg5\Documents\GitHub\d12pack');
+[githubDir,~,~] = fileparts(pwd);
+d12packDir = fullfile(githubDir,'d12pack');
+addpath(d12packDir);
 
 projectDir = '\\root\projects\Acuity_MtSinai';
+dataDir = fullfile(projectDir,'croppedData');
+saveDir = fullfile(projectDir,'daysigrams');
 
-dataDir = fullfile(projectDir,'CroppedData');
+ls = dir([dataDir,filesep,'*.mat']);
 
-ls = dir(fullfile(dataDir,'*.mat'));
-[~,idxMostRecent] = max(vertcat(ls.datenum));
-dataName = ls(idxMostRecent).name;
-dataPath = fullfile(dataDir,dataName);
-
-exportDir = fullfile(projectDir,'Daysigrams');
-
-DataCluster = load(dataPath);
-
-timestamp = upper(datestr(now,'mmmdd'));
-
-objArray = DataCluster.T1Person;
-for iObj = 1:numel(objArray)
-    thisObj = objArray(iObj);
+for iFile = 1:numel(ls)
+    dataName = ls(iFile).name;
+    dataPath = fullfile(dataDir,dataName);
+    load(dataPath);
     
-    if isempty(thisObj.Time)
-        continue
-    end
-    
-    titleText = {'Acuity - Mt Sinai';['ID: ',thisObj.ID,', Session: ',thisObj.Session.Name,', Device SN: ',num2str(thisObj.SerialNumber)]};
-    
-    d = d12pack.daysigram(thisObj,titleText);
-    
-    for iFile = 1:numel(d)
+    for iObj = 1:numel(objArray)
+        thisObj = objArray(iObj);
         
-        fileName = [thisObj.ID,'_',thisObj.Session.Name,'_',timestamp,'_p',num2str(iFile),'.pdf'];
-        filePath = fullfile(exportDir,fileName);
-        saveas(d(iFile).Figure,filePath);
-        close(d(iFile).Figure);
+        if isempty(thisObj.Time)
+            continue
+        end
         
-    end
-end
-
-
-objArray = DataCluster.T3Person;
-for iObj = 1:numel(objArray)
-    thisObj = objArray(iObj);
-    
-    if isempty(thisObj.Time)
-        continue
-    end
-    
-    titleText = {'Acuity - Mt Sinai';['ID: ',thisObj.ID,', Session: ',thisObj.Session.Name,', Device SN: ',num2str(thisObj.SerialNumber)]};
-    
-    d = d12pack.daysigram(thisObj,titleText);
-    
-    for iFile = 1:numel(d)
+        titleText = {'Acuity - Mt Sinai';['ID: ',thisObj.ID,', Session: ',thisObj.Session.Name,', Device SN: ',num2str(thisObj.SerialNumber)]};
         
-        fileName = [thisObj.ID,'_',thisObj.Session.Name,'_',timestamp,'_p',num2str(iFile),'.pdf'];
-        filePath = fullfile(exportDir,fileName);
-        saveas(d(iFile).Figure,filePath);
-        close(d(iFile).Figure);
+        d = d12pack.daysigram(thisObj,titleText);
         
-    end
-end
-
-
-objArray = DataCluster.T3Fixture;
-for iObj = 1:numel(objArray)
-    thisObj = objArray(iObj);
-    
-    if isempty(thisObj.Time)
-        continue
-    end
-    
-    titleText = {'Acuity - Mt Sinai';['ID: ',thisObj.ID,', Session: ',thisObj.Session.Name,', Device SN: ',num2str(thisObj.SerialNumber)]};
-    
-    d = d12pack.daysigram(thisObj,titleText);
-    
-    for iFile = 1:numel(d)
-        
-        fileName = [thisObj.ID,'_',thisObj.Session.Name,'_',timestamp,'_p',num2str(iFile),'.pdf'];
-        filePath = fullfile(exportDir,fileName);
-        saveas(d(iFile).Figure,filePath);
-        close(d(iFile).Figure);
-        
-    end
-end
-
-
-objArray = DataCluster.T3Bed;
-for iObj = 1:numel(objArray)
-    thisObj = objArray(iObj);
-    
-    if isempty(thisObj.Time)
-        continue
-    end
-    
-    titleText = {'Acuity - Mt Sinai';['ID: ',thisObj.ID,', Session: ',thisObj.Session.Name,', Device SN: ',num2str(thisObj.SerialNumber)]};
-    
-    d = d12pack.daysigram(thisObj,titleText);
-    
-    for iFile = 1:numel(d)
-        
-        fileName = [thisObj.ID,'_',thisObj.Session.Name,'_',timestamp,'_p',num2str(iFile),'.pdf'];
-        filePath = fullfile(exportDir,fileName);
-        saveas(d(iFile).Figure,filePath);
-        close(d(iFile).Figure);
-        
+        nFig = numel(d);
+        savePaths = cell(nFig,1);
+        for iFig = 1:numel(d)
+            d(iFig).Title = titleText;
+            
+            name = [thisObj.ID,'_',thisObj.Session.Name,'_',timestamp,'_p',num2str(iFig),'.pdf'];
+            savePaths{iFig} = fullfile(saveDir,name);
+            saveas(d(iFig).Figure,savePaths{iFig})
+            close(d(iFig).Figure)
+        end
+        nameAll = [thisObj.ID,'_',thisObj.Session.Name,'_',timestamp,'.pdf'];
+        savePathAll = fullfile(saveDir,nameAll);
+        append_pdfs(savePathAll, savePaths{:});
+        delete(savePaths{:});
     end
 end
 
