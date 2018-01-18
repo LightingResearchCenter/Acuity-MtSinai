@@ -1,15 +1,27 @@
+---
+title: "Acuity/Mount Sinia"
+author: "L&H"
+date: "January 18, 2018"
+output:
+  word_document: default
+  html_document: default
+---
 
-
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
 library(readxl)
+library(reshape2)
+library(ggplot2)
+library(plotly)
 
-###code to find the table files 
-ls <- list.files("//root/projects/Acuity_MtSinai/tables")
-grep("Average CS summary", ls)
-grep("Morning CS", ls)
+```
 
 
-##Importing porcessed data - Average CS & Morning CS
 
+## Average CS & Morning CS summary
+
+
+```{r echo=FALSE, warning=FALSE, cache=FALSE, results=FALSE}
 T1_Average_CS_summary <- read_excel("//root/projects/Acuity_MtSinai/tables/2018-01-17_1350 Average CS summary.xlsx", 
                                                   sheet = "2018-01-17_1313-T1-person")
 
@@ -66,7 +78,8 @@ ggplot(Average_CS_summary_conditions, aes(x=time, y=mean_valid_CS, fill = condit
   geom_bar(position=position_dodge(0.9), stat="identity", color="black" ) +
   geom_errorbar(aes(ymin=mean_valid_CS-se, ymax=mean_valid_CS+se), colour =  "black",
                 width=.2 , position=position_dodge(.9)) +
-  scale_fill_manual(values=c("deepskyblue4", "orange1"))
+  scale_fill_manual(values=c("deepskyblue4", "orange1"))+
+  ggtitle("Average CS") 
 
 
 
@@ -131,5 +144,11 @@ ggplot(T3_person_Morning_CS_conditions, aes(x=condition, y=morning_CS, fill = co
   scale_fill_manual(values=c("deepskyblue4", "orange1"))+
   ggtitle("T3 person morning CS")+
   geom_signif(comparisons = list(c("BWL", "DWL")), annotations="**")
+
+
+
+
+```
+
 
 
