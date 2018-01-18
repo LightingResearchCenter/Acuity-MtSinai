@@ -44,8 +44,8 @@ T3_person_Morning_CS <- read_excel("//root/projects/Acuity_MtSinai/tables/2018-0
 
 # Adding T1/T3 factor & Changing the subject column name
 
-T1_Average_CS_summary$time <- "T1"
-T3_Average_CS_summary$time <- "T3"
+T1_Average_CS_summary$session <- "T1"
+T3_Average_CS_summary$session <- "T3"
 
 colnames(T1_Average_CS_summary)[1] <- "subject"
 colnames(T3_Average_CS_summary)[1] <- "subject"
@@ -66,15 +66,13 @@ library(Rmisc)
 library(plotly)
 library(ggsignif)
 
-#Summarize data accross time and condition
+#Summarize data accross session and condition
 
 Average_CS_summary <- subset(Average_CS_summary, condition != "unknown")
-Average_CS_summary_conditions <- summarySE(Average_CS_summary, measurevar = "mean_valid_CS", groupvars = c("condition", "time"))
-
-t.test(mean_valid_CS ~ condition, data = Average_CS_summary[Average_CS_summary$time == "T3",])
+Average_CS_summary_conditions <- summarySE(Average_CS_summary, measurevar = "mean_valid_CS", groupvars = c("condition", "session"))
 
 
-ggplot(Average_CS_summary_conditions, aes(x=time, y=mean_valid_CS, fill = condition)) +
+ggplot(Average_CS_summary_conditions, aes(x=session, y=mean_valid_CS, fill = condition)) +
   geom_bar(position=position_dodge(0.9), stat="identity", color="black" ) +
   geom_errorbar(aes(ymin=mean_valid_CS-se, ymax=mean_valid_CS+se), colour =  "black",
                 width=.2 , position=position_dodge(.9)) +
@@ -82,6 +80,7 @@ ggplot(Average_CS_summary_conditions, aes(x=time, y=mean_valid_CS, fill = condit
   ggtitle("Average CS") 
 
 
+t.test(mean_valid_CS ~ condition, data = Average_CS_summary[Average_CS_summary$session == "T3",])
 
 
 
@@ -96,7 +95,6 @@ T3_bed_Morning_CS_conditions <- summarySE(T3_bed_Morning_CS, measurevar = "morni
 T3_bed_Morning_CS_conditions$morning_CS <- as.numeric(T3_bed_Morning_CS_conditions$morning_CS)
 T3_bed_Morning_CS_conditions$condition <- as.factor(T3_bed_Morning_CS_conditions$condition)
 
-t.test(morning_CS ~ condition, data = T3_bed_Morning_CS)
 
 ggplot(T3_bed_Morning_CS_conditions, aes(x=condition, y=morning_CS, fill = condition)) +
   geom_bar(position=position_dodge(0.9), stat="identity", color="black" ) +
@@ -106,6 +104,7 @@ ggplot(T3_bed_Morning_CS_conditions, aes(x=condition, y=morning_CS, fill = condi
   ggtitle("T3 bed morning CS") +
   geom_signif(comparisons = list(c("BWL", "DWL")), annotations="****")
 
+t.test(morning_CS ~ condition, data = T3_bed_Morning_CS)
 
 
 
@@ -116,7 +115,6 @@ ggplot(T3_bed_Morning_CS_conditions, aes(x=condition, y=morning_CS, fill = condi
 T3_fixture_Morning_CS <- subset(T3_fixture_Morning_CS, condition != "unknown")
 T3_fixture_Morning_CS_conditions <- summarySE(T3_fixture_Morning_CS, measurevar = "morning_CS", groupvars = c("condition"))
 
-t.test(morning_CS ~ condition, data = T3_fixture_Morning_CS)
 
 ggplot(T3_fixture_Morning_CS_conditions, aes(x=condition, y=morning_CS, fill = condition)) +
   geom_bar(position=position_dodge(0.9), stat="identity", color="black" ) +
@@ -127,6 +125,7 @@ ggplot(T3_fixture_Morning_CS_conditions, aes(x=condition, y=morning_CS, fill = c
   geom_signif(comparisons = list(c("BWL", "DWL")), annotations="****")
 
 
+t.test(morning_CS ~ condition, data = T3_fixture_Morning_CS)
 
 
 ##Person
@@ -135,7 +134,6 @@ ggplot(T3_fixture_Morning_CS_conditions, aes(x=condition, y=morning_CS, fill = c
 T3_person_Morning_CS <- subset(T3_person_Morning_CS, condition != "unknown")
 T3_person_Morning_CS_conditions <- summarySE(T3_person_Morning_CS, measurevar = "morning_CS", groupvars = c("condition"))
 
-t.test(morning_CS ~ condition, data = T3_person_Morning_CS)
 
 ggplot(T3_person_Morning_CS_conditions, aes(x=condition, y=morning_CS, fill = condition)) +
   geom_bar(position=position_dodge(0.9), stat="identity", color="black" ) +
@@ -145,6 +143,7 @@ ggplot(T3_person_Morning_CS_conditions, aes(x=condition, y=morning_CS, fill = co
   ggtitle("T3 person morning CS")+
   geom_signif(comparisons = list(c("BWL", "DWL")), annotations="**")
 
+t.test(morning_CS ~ condition, data = T3_person_Morning_CS)
 
 
 
@@ -152,3 +151,149 @@ ggplot(T3_person_Morning_CS_conditions, aes(x=condition, y=morning_CS, fill = co
 
 
 
+
+## Average IV & IS summary
+
+
+```{r echo=FALSE, warning=FALSE, cache=FALSE, results=FALSE}
+
+library(readxl)
+library(Rmisc)
+ActiwatchAnalyses <- read_excel("//root/projects/Acuity_MtSinai/Analyzed actiwatch data/2018-01-17_1511_ActiwatchAnalyses_with_conditions.xlsx", 
+                                                                 sheet = "Sheet1")
+
+ActiwatchAnalyses <- subset(ActiwatchAnalyses, subject != 450)
+
+
+
+Average_IV_summary_conditions <- summarySE(ActiwatchAnalyses, measurevar = "IV", groupvars = c("condition", "session"))
+
+
+
+ggplot(Average_IV_summary_conditions, aes(x=session, y=IV, fill = condition)) +
+  geom_bar(position=position_dodge(0.9), stat="identity", color="black" ) +
+  geom_errorbar(aes(ymin=IV-se, ymax=IV+se), colour =  "black",
+                width=.2 , position=position_dodge(.9)) +
+  scale_fill_manual(values=c("deepskyblue4", "orange1"))+
+  ggtitle("Average IV") 
+
+t.test(IV ~ condition, data = ActiwatchAnalyses[ActiwatchAnalyses$session == "T3",])
+
+Average_IS_summary_conditions <- summarySE(ActiwatchAnalyses[!is.na(ActiwatchAnalyses$IS),], measurevar = "IS", groupvars = c("condition", "session"))
+
+
+ggplot(Average_IS_summary_conditions, aes(x=session, y=IS, fill = condition)) +
+  geom_bar(position=position_dodge(0.9), stat="identity", color="black" ) +
+  geom_errorbar(aes(ymin=IS-se, ymax=IS+se), colour =  "black",
+                width=.2 , position=position_dodge(.9)) +
+  scale_fill_manual(values=c("deepskyblue4", "orange1"))+
+  ggtitle("Average IS") 
+
+t.test(IS ~ condition, data = ActiwatchAnalyses[ActiwatchAnalyses$session == "T3",])
+
+```
+
+
+## Acrophase
+
+
+```{r echo=FALSE, warning=FALSE, cache=FALSE, results=FALSE}
+
+library(tidyr)
+library(reshape2)
+library(nlme)
+acrophase_data <- ActiwatchAnalyses
+acrophase_data$nHours <- NULL
+acrophase_data$IS <- NULL
+acrophase_data$IV <- NULL
+
+acrophase_data2 <- spread(acrophase_data, key =  "session", value = "acrophase")
+
+acrophase_data2$deltaT3 <- as.numeric(difftime(acrophase_data2$T1, acrophase_data2$T3,  units = "mins" ))
+acrophase_data2$deltaT4 <- as.numeric(difftime(acrophase_data2$T1, acrophase_data2$T4,  units = "mins" ))
+acrophase_data2$deltaT5 <- as.numeric(difftime(acrophase_data2$T1, acrophase_data2$T5,  units = "mins" ))
+
+acrophase_data3 <- melt(acrophase_data2, id.vars = c("subject", "condition"), measure.vars = c("deltaT3", "deltaT4", "deltaT5"))
+
+acrophase_data3$variable <- as.numeric(substr(acrophase_data3$variable, 7, 7))
+acrophase_data3 <- subset(acrophase_data3, !is.na(acrophase_data3$value))
+
+acrophase_data3_summary <- summarySE(acrophase_data3, measurevar = "value", groupvars = c("condition", "variable"))
+pd <- position_dodge(0.1) # move them .05 to the left and right
+
+ggplot(acrophase_data3_summary, aes(x=variable, y=value, colour=condition, group=condition)) + 
+  geom_errorbar(aes(ymin=value-se, ymax=value+se), colour="black", width=.1, position=pd) +
+  geom_line(position=pd) +
+  geom_point(position=pd, size=3) +
+  labs(x = "Session number", y = "Delta = T1 - i") +
+  scale_colour_manual(values=c("deepskyblue4", "orange1"))
+
+
+acrophase_model1 <- lme(value ~ condition*variable , random = ~1|subject/variable,
+                   data=acrophase_data3)
+
+anova(acrophase_model1)
+
+
+
+t.test(deltaT3 ~ condition, data = acrophase_data2[!is.na(acrophase_data2$deltaT3),])
+
+
+t.test(deltaT4 ~ condition, data = acrophase_data2[!is.na(acrophase_data2$deltaT4),])
+
+
+t.test(deltaT5 ~ condition, data = acrophase_data2[!is.na(acrophase_data2$deltaT5),])
+
+
+
+##Absolute value
+
+acrophase_data4 <- acrophase_data3
+
+acrophase_data4$value <- abs(acrophase_data4$value)
+
+acrophase_data4_summary <- summarySE(acrophase_data4, measurevar = "value", groupvars = c("condition", "variable"))
+
+
+
+
+acrophase_data4_summary <- summarySE(acrophase_data4, measurevar = "value", groupvars = c("condition", "variable"))
+pd <- position_dodge(0.1) # move them .05 to the left and right
+
+ggplot(acrophase_data4_summary, aes(x=variable, y=value, colour=condition, group=condition)) + 
+  geom_errorbar(aes(ymin=value-se, ymax=value+se), colour="black", width=.1, position=pd) +
+  geom_line(position=pd) +
+  geom_point(position=pd, size=3) +
+  labs(x = "Session number", y = "Delta = abs(T1 - i)")+
+  scale_colour_manual(values=c("deepskyblue4", "orange1"))
+
+
+
+
+acrophase_model2 <- lme(value ~ condition*variable , random = ~1|subject/variable,
+                        data=acrophase_data4)
+
+anova(acrophase_model2)
+
+
+
+
+
+acrophase_data2$deltaT3abs <- abs(as.numeric(difftime(acrophase_data2$T1, acrophase_data2$T3,  units = "mins" )))
+acrophase_data2$deltaT4abs <- abs(as.numeric(difftime(acrophase_data2$T1, acrophase_data2$T4,  units = "mins" )))
+acrophase_data2$deltaT5abs <- abs(as.numeric(difftime(acrophase_data2$T1, acrophase_data2$T5,  units = "mins" )))
+
+
+
+
+t.test(deltaT3abs ~ condition, data = acrophase_data2[!is.na(acrophase_data2$deltaT3abs),])
+
+t.test(deltaT4abs ~ condition, data = acrophase_data2[!is.na(acrophase_data2$deltaT4abs),])
+
+t.test(deltaT4abs ~ condition, data = acrophase_data2[!is.na(acrophase_data2$deltaT4abs),])
+
+t.test(deltaT5abs ~ condition, data = acrophase_data2[!is.na(acrophase_data2$deltaT5abs),])
+
+
+
+```
