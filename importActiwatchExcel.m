@@ -5,6 +5,12 @@ function data = importActiwatchExcel(filePath,sheet)
 % Read data from file
 [~,~,raw] = xlsread(filePath,sheet,'','basic');
 
+% Check if sheet is empty or near empty
+if numel(raw) <= 1
+    data = [];
+    return;
+end
+
 % Find marker indicating start of raw data
 idxLine     = strcmp(raw(:,1),'Line');
 idxDate     = strcmp(raw(:,2),'Date');

@@ -11,7 +11,7 @@ addpath(circadianDir);
 % Map paths
 timestamp = datestr(now,'yyyy-mm-dd_HHMM');
 
-projectDir = '\\ROOT\projects\GSA_Daysimeter\StateDepartment_2017\Actigraph_Data';
+projectDir = '\\root\projects\Acuity_MtSinai\Analyzed actiwatch data';
 
 ls = dir([projectDir,filesep,'*.mat']);
 [~,idxMostRecent] = max(vertcat(ls.datenum));
@@ -41,34 +41,22 @@ for iD = 1:numel(dataArray)
         continue
     end
     
-    % Find samples belonging to the last day
-    lastTime = max(data.DateTime);
-    idxLast  = data.DateTime >= dateshift(lastTime,'start','day');
-    
     % Perform IS and IV analysis
     [IS_all, IV_all ] = isiv2(data.DateTime,          data.Activity         );
-    [IS_last,IV_last] = isiv2(data.DateTime(idxLast), data.Activity(idxLast));
     
     % Perform cosinor analysis
     [~, ~, phi_all ] = phasor.cosinorfit(datenum(data.DateTime), data.Activity, 1, 1);
-    [~, ~, phi_last] = phasor.cosinorfit(datenum(data.DateTime(idxLast)), data.Activity(idxLast), 1, 1);
     % Convert radians to time of day
     acrophase_all  = duration(mod( phi_all,2*pi)*12/pi, 0, 0);
-    acrophase_last = duration(mod(phi_last,2*pi)*12/pi, 0, 0);
     
     % Find the number of days used
     nHours_all  = hours(numel(data.DateTime)*mode(diff(data.DateTime)));
-    nHours_last = hours(numel(data.DateTime(idxLast))*mode(diff(data.DateTime)));
     
     % Assign results to table
-    T.nHours_all(iD)     = nHours_all;
-    T.nHours_last(iD)    = nHours_last;
-    T.IS_all(iD)         = IS_all;
-    T.IS_last(iD)        = IS_last;
-    T.IV_all(iD)         = IV_all;
-    T.IV_last(iD)        = IV_last;
-    T.acrophase_all(iD)  = acrophase_all;
-    T.acrophase_last(iD) = acrophase_last;
+    T.nHours(iD)     = nHours_all;
+    T.IS(iD)         = IS_all;
+    T.IV(iD)         = IV_all;
+    T.acrophase(iD)  = acrophase_all;
     
 end % end of for
 
