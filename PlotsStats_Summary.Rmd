@@ -13,6 +13,7 @@ library(readxl)
 library(reshape2)
 library(ggplot2)
 library(plotly)
+library(nlme)
 
 ```
 
@@ -51,14 +52,26 @@ colnames(T1_Average_CS_summary)[1] <- "subject"
 colnames(T3_Average_CS_summary)[1] <- "subject"
 
 
+
+
 # Binding the data.frames together in new data.frame, remove parent data.frames
 
 Average_CS_summary <- rbind(T1_Average_CS_summary, T3_Average_CS_summary)
 
 rm(T1_Average_CS_summary, T3_Average_CS_summary)
 
+# setting factors
+Average_CS_summary$subject <- as.factor(Average_CS_summary$subject)
+Average_CS_summary$condition <- as.factor(Average_CS_summary$condition)
 
+T3_bed_Morning_CS$subject <- as.factor(T3_bed_Morning_CS$subject)
+T3_bed_Morning_CS$condition <- as.factor(T3_bed_Morning_CS$condition)
 
+T3_fixture_Morning_CS$subject <- as.factor(T3_fixture_Morning_CS$subject)
+T3_fixture_Morning_CS$condition <- as.factor(T3_fixture_Morning_CS$condition)
+
+T3_person_Morning_CS$subject <- as.factor(T3_person_Morning_CS$subject)
+T3_person_Morning_CS$condition <- as.factor(T3_person_Morning_CS$condition)
 ### Summary plots of data
 
 library(ggplot2)
