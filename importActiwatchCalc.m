@@ -1,37 +1,30 @@
-function [sleepB, sleepI] = importActiwatchCalc(filePath,sheet)
+function sleep = importActiwatchCalc(filePath,sheet)
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 
 % Read data from file
 [~,~,raw] = xlsread(filePath,sheet,'','basic');
 
-% Find markers indicating start week1 and week2
-idxWeek1 = find(strcmp(raw(:,1),'week1'));
-idxWeek2 = find(strcmp(raw(:,1),'week2'));
 
 % Select start and end dates
-sleepStartB = raw(idxWeek1+2:idxWeek2-1,3);
-sleepEndB   = raw(idxWeek1+2:idxWeek2-1,5);
-
-sleepStartI = raw(idxWeek2+2:end,3);
-sleepEndI   = raw(idxWeek2+2:end,5);
+sleepStartDates = raw(3:end,3);
+sleepStartTimes = raw(3:end,5);
+sleepEndDates   = raw(3:end,6);
+sleepEndTimes   = raw(3:end,8);
 
 % Filter out emty and nonnumeric cells
 fValid = @(x) isnumeric(x) & ~isnan(x);
 
-sleepStartB = cell2mat(sleepStartB(cellfun(fValid, sleepStartB)));
-sleepEndB   = cell2mat(sleepEndB(  cellfun(fValid, sleepEndB  )));
-sleepStartI = cell2mat(sleepStartI(cellfun(fValid, sleepStartI)));
-sleepEndI   = cell2mat(sleepEndI(  cellfun(fValid, sleepEndI  )));
+sleepStartDates = cell2mat(sleepStartDates(cellfun(fValid, sleepStartDates)));
+sleepStartTimes = cell2mat(sleepStartTimes(cellfun(fValid, sleepStartTimes)));
+sleepEndDates   = cell2mat(sleepEndDates(  cellfun(fValid, sleepEndDates  )));
+sleepEndTimes   = cell2mat(sleepEndTimes(  cellfun(fValid, sleepEndTimes  )));
 
 % Convert Excel dates to datetime and store in structs
-sleepB = struct;
-sleepI = struct;
+sleep = struct;
 
-sleepB.startDates = datetime(sleepStartB,'ConvertFrom','excel','TimeZone','local');
-sleepB.endDates   = datetime(sleepEndB,  'ConvertFrom','excel','TimeZone','local');
+sleep.start = datetime(sleepStartDates+sleepStartTimes,'ConvertFrom','excel','TimeZone','local');
+sleep.end   = datetime(sleepEndDates+sleepEndTimes,  'ConvertFrom','excel','TimeZone','local');
 
-sleepI.startDates = datetime(sleepStartI,'ConvertFrom','excel','TimeZone','local');
-sleepI.endDates   = datetime(sleepEndI,  'ConvertFrom','excel','TimeZone','local');
 end
 

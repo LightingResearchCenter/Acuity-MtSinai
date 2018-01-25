@@ -34,7 +34,7 @@ for iHour = nHours:-1:1
 end
 
 if (n < 48 || n*epochSec < 48*3600)
-    warning('Cannot compute interdail stability statistic because time series is less than 48 hours');
+    warning('Cannot compute interdaily stability statistic because time series is less than 48 hours');
     interdailyStability = nan;
 else
     A_p = modifiedenright(unqHours,hourlyDataArray,24);
