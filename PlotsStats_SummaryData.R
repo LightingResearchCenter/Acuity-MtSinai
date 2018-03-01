@@ -10,22 +10,22 @@ grep("Morning CS", ls)
 
 ##Importing porcessed data - Average CS & Morning CS
 
-T1_Average_CS_summary <- read_excel("//root/projects/Acuity_MtSinai/tables/2018-01-17_1350 Average CS summary.xlsx", 
-                                                  sheet = "2018-01-17_1313-T1-person")
+T1_Average_CS_summary <- read_excel("//root/projects/Acuity_MtSinai/tables/2018-02-26_1502 Average CS summary.xlsx", 
+                                    sheet = "2018-02-26_1420-T1-person")
 
-T3_Average_CS_summary <- read_excel("//root/projects/Acuity_MtSinai/tables/2018-01-17_1350 Average CS summary.xlsx", 
-                                                  sheet = "2018-01-17_1313-T3-person")
+T3_Average_CS_summary <-  read_excel("//root/projects/Acuity_MtSinai/tables/2018-02-26_1502 Average CS summary.xlsx", 
+                                     sheet = "2018-02-26_1420-T3-person")
 
 
+T3_bed_Morning_CS <-read_excel("//root/projects/Acuity_MtSinai/tables/2018-02-26_1502 Morning CS.xlsx", 
+                               sheet = "2018-02-26_1420-T3-bed")
 
-T3_bed_Morning_CS <- read_excel("//root/projects/Acuity_MtSinai/tables/2018-01-17_1350 Morning CS.xlsx", 
-                                          sheet = "2018-01-17_1313-T3-bed")
+T3_fixture_Morning_CS <- read_excel("//root/projects/Acuity_MtSinai/tables/2018-02-26_1502 Morning CS.xlsx", 
+                                    sheet = "2018-02-26_1420-T3-fixture")
 
-T3_fixture_Morning_CS <- read_excel("//root/projects/Acuity_MtSinai/tables/2018-01-17_1350 Morning CS.xlsx", 
-                                          sheet = "2018-01-17_1313-T3-fixture")
+T3_person_Morning_CS <- read_excel("//root/projects/Acuity_MtSinai/tables/2018-02-26_1502 Morning CS.xlsx", 
+                                   sheet = "2018-02-26_1420-T3-person")
 
-T3_person_Morning_CS <- read_excel("//root/projects/Acuity_MtSinai/tables/2018-01-17_1350 Morning CS.xlsx", 
-                                          sheet = "2018-01-17_1313-T3-person")
 
 
 ##Combining data.frames for Average CS summary
@@ -66,7 +66,13 @@ ggplot(Average_CS_summary_conditions, aes(x=time, y=mean_valid_CS, fill = condit
   geom_bar(position=position_dodge(0.9), stat="identity", color="black" ) +
   geom_errorbar(aes(ymin=mean_valid_CS-se, ymax=mean_valid_CS+se), colour =  "black",
                 width=.2 , position=position_dodge(.9)) +
-  scale_fill_manual(values=c("deepskyblue4", "orange1"))
+  scale_fill_manual(values=c("deepskyblue4", "orange1"))+
+  labs(x = " Measurement Session", y ="Mean Circadian Stimulus (CS)")  +
+  geom_text(aes(label = paste("Mean =", round(mean_valid_CS, digits = 3), sep = " "), vjust=4), position=position_dodge(.9))+
+  geom_text(aes(label = paste("SEM =", round(se, digits = 3), sep = " "), vjust=6), position=position_dodge(.9))
+
+
+ggsave("//root/projects/Acuity_MtSinai/Reports/Figures/fig1-meanCS.png", dpi = 300)
 
 
 
@@ -90,11 +96,16 @@ ggplot(T3_bed_Morning_CS_conditions, aes(x=condition, y=morning_CS, fill = condi
   geom_errorbar(aes(ymin=morning_CS-se, ymax=morning_CS+se), colour =  "black",
                 width=.2 , position=position_dodge(.9)) +
   scale_fill_manual(values=c("deepskyblue4", "orange1"))+
-  ggtitle("T3 bed morning CS") +
-  geom_signif(comparisons = list(c("BWL", "DWL")), annotations="****")
+  #ggtitle("T3 bed morning CS") +
+  geom_signif(comparisons = list(c("BWL", "DWL")), annotations="****")+
+  labs(x = " Measurement Session", y ="Mean Circadian Stimulus (CS)")+
+  coord_cartesian(ylim=c(0,.4))+
+  geom_text(aes(label = paste("Mean =", round(morning_CS, digits = 3), sep = " "), vjust=3), position=position_dodge(.9))+
+  geom_text(aes(label = paste("SEM =", round(se, digits = 3), sep = " "), vjust=5), position=position_dodge(.9))
 
 
 
+ggsave("//root/projects/Acuity_MtSinai/Reports/Figures/fig2-mornCSbed.png", dpi = 300)
 
 
 ##Fixture
@@ -110,8 +121,18 @@ ggplot(T3_fixture_Morning_CS_conditions, aes(x=condition, y=morning_CS, fill = c
   geom_errorbar(aes(ymin=morning_CS-se, ymax=morning_CS+se), colour =  "black",
                 width=.2 , position=position_dodge(.9)) +
   scale_fill_manual(values=c("deepskyblue4", "orange1"))+
-  ggtitle("T3 fixture morning CS")+
-  geom_signif(comparisons = list(c("BWL", "DWL")), annotations="****")
+  #ggtitle("T3 fixture morning CS")+
+  geom_signif(comparisons = list(c("BWL", "DWL")), annotations="****")+
+  labs(x = " Measurement Session", y ="Mean Circadian Stimulus (CS)")+
+  coord_cartesian(ylim=c(0,.4))+
+  geom_text(aes(label = paste("Mean =", round(morning_CS, digits = 3), sep = " "), vjust=3), position=position_dodge(.9))+
+  geom_text(aes(label = paste("SEM =", round(se, digits = 3), sep = " "), vjust=5), position=position_dodge(.9))
+
+
+
+ggsave("//root/projects/Acuity_MtSinai/Reports/Figures/fig3-mornCSfix.png", dpi = 300)
+
+
 
 
 
@@ -129,7 +150,15 @@ ggplot(T3_person_Morning_CS_conditions, aes(x=condition, y=morning_CS, fill = co
   geom_errorbar(aes(ymin=morning_CS-se, ymax=morning_CS+se), colour =  "black",
                 width=.2 , position=position_dodge(.9)) +
   scale_fill_manual(values=c("deepskyblue4", "orange1"))+
-  ggtitle("T3 person morning CS")+
-  geom_signif(comparisons = list(c("BWL", "DWL")), annotations="**")
+  #ggtitle("T3 person morning CS")+
+  coord_cartesian(ylim=c(0,.4))+
+  geom_signif(comparisons = list(c("BWL", "DWL")), annotations="**")+
+  labs(x = " Measurement Session", y ="Mean Circadian Stimulus (CS)")+
+  geom_text(aes(label = paste("Mean =", round(morning_CS, digits = 3), sep = " "), vjust=3), position=position_dodge(.9))+
+  geom_text(aes(label = paste("SEM =", round(se, digits = 3), sep = " "), vjust=5), position=position_dodge(.9))
+
+
+
+ggsave("//root/projects/Acuity_MtSinai/Reports/Figures/fig4-mornCShuman.png", dpi = 300)
 
 

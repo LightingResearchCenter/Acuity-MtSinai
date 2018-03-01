@@ -1,7 +1,7 @@
 ---
 title: "Acuity/Mount Sinia"
 author: "L&H"
-date: "January 18, 2018"
+date: "Feburary 26, 2018"
 output:
   word_document: default
   html_document: default
@@ -22,23 +22,22 @@ library(nlme)
 ## Average CS & Morning CS summary
 
 
-```{r echo=FALSE, warning=FALSE, cache=FALSE, results=FALSE}
-T1_Average_CS_summary <- read_excel("//root/projects/Acuity_MtSinai/tables/2018-01-17_1350 Average CS summary.xlsx", 
-                                                  sheet = "2018-01-17_1313-T1-person")
+```{r echo=FALSE, warning=FALSE, cache=FALSE, results="asis"}
+T1_Average_CS_summary <- read_excel("//root/projects/Acuity_MtSinai/tables/2018-02-26_1502 Average CS summary.xlsx", 
+    sheet = "2018-02-26_1420-T1-person")
 
-T3_Average_CS_summary <- read_excel("//root/projects/Acuity_MtSinai/tables/2018-01-17_1350 Average CS summary.xlsx", 
-                                                  sheet = "2018-01-17_1313-T3-person")
+T3_Average_CS_summary <-  read_excel("//root/projects/Acuity_MtSinai/tables/2018-02-26_1502 Average CS summary.xlsx", 
+    sheet = "2018-02-26_1420-T3-person")
 
 
+T3_bed_Morning_CS <-read_excel("//root/projects/Acuity_MtSinai/tables/2018-02-26_1502 Morning CS.xlsx", 
+    sheet = "2018-02-26_1420-T3-bed")
 
-T3_bed_Morning_CS <- read_excel("//root/projects/Acuity_MtSinai/tables/2018-01-17_1350 Morning CS.xlsx", 
-                                          sheet = "2018-01-17_1313-T3-bed")
+T3_fixture_Morning_CS <- read_excel("//root/projects/Acuity_MtSinai/tables/2018-02-26_1502 Morning CS.xlsx", 
+    sheet = "2018-02-26_1420-T3-fixture")
 
-T3_fixture_Morning_CS <- read_excel("//root/projects/Acuity_MtSinai/tables/2018-01-17_1350 Morning CS.xlsx", 
-                                          sheet = "2018-01-17_1313-T3-fixture")
-
-T3_person_Morning_CS <- read_excel("//root/projects/Acuity_MtSinai/tables/2018-01-17_1350 Morning CS.xlsx", 
-                                          sheet = "2018-01-17_1313-T3-person")
+T3_person_Morning_CS <- read_excel("//root/projects/Acuity_MtSinai/tables/2018-02-26_1502 Morning CS.xlsx", 
+    sheet = "2018-02-26_1420-T3-person")
 
 
 ##Combining data.frames for Average CS summary
@@ -64,13 +63,13 @@ rm(T1_Average_CS_summary, T3_Average_CS_summary)
 Average_CS_summary$subject <- as.factor(Average_CS_summary$subject)
 Average_CS_summary$condition <- as.factor(Average_CS_summary$condition)
 
-T3_bed_Morning_CS$subject <- as.factor(T3_bed_Morning_CS$subject)
+#T3_bed_Morning_CS$subject <- as.factor(T3_bed_Morning_CS$subject)
 T3_bed_Morning_CS$condition <- as.factor(T3_bed_Morning_CS$condition)
 
-T3_fixture_Morning_CS$subject <- as.factor(T3_fixture_Morning_CS$subject)
+#T3_fixture_Morning_CS$subject <- as.factor(T3_fixture_Morning_CS$subject)
 T3_fixture_Morning_CS$condition <- as.factor(T3_fixture_Morning_CS$condition)
 
-T3_person_Morning_CS$subject <- as.factor(T3_person_Morning_CS$subject)
+#T3_person_Morning_CS$subject <- as.factor(T3_person_Morning_CS$subject)
 T3_person_Morning_CS$condition <- as.factor(T3_person_Morning_CS$condition)
 ### Summary plots of data
 
@@ -78,12 +77,17 @@ library(ggplot2)
 library(Rmisc)
 library(plotly)
 library(ggsignif)
-
+library(knitr)
 #Summarize data accross session and condition
 
 Average_CS_summary <- subset(Average_CS_summary, condition != "unknown")
 Average_CS_summary_conditions <- summarySE(Average_CS_summary, measurevar = "mean_valid_CS", groupvars = c("condition", "session"))
 
+
+
+
+
+kable(Average_CS_summary_conditions, caption = "Mean CS between lighting condition.")
 
 ggplot(Average_CS_summary_conditions, aes(x=session, y=mean_valid_CS, fill = condition)) +
   geom_bar(position=position_dodge(0.9), stat="identity", color="black" ) +
@@ -108,6 +112,8 @@ T3_bed_Morning_CS_conditions <- summarySE(T3_bed_Morning_CS, measurevar = "morni
 T3_bed_Morning_CS_conditions$morning_CS <- as.numeric(T3_bed_Morning_CS_conditions$morning_CS)
 T3_bed_Morning_CS_conditions$condition <- as.factor(T3_bed_Morning_CS_conditions$condition)
 
+kable(T3_bed_Morning_CS_conditions, caption = "Mean morning CS on T3, for the bed Daysimeter between lighting conditions.")
+
 
 ggplot(T3_bed_Morning_CS_conditions, aes(x=condition, y=morning_CS, fill = condition)) +
   geom_bar(position=position_dodge(0.9), stat="identity", color="black" ) +
@@ -128,6 +134,7 @@ t.test(morning_CS ~ condition, data = T3_bed_Morning_CS)
 T3_fixture_Morning_CS <- subset(T3_fixture_Morning_CS, condition != "unknown")
 T3_fixture_Morning_CS_conditions <- summarySE(T3_fixture_Morning_CS, measurevar = "morning_CS", groupvars = c("condition"))
 
+kable(T3_fixture_Morning_CS_conditions, caption = "Mean morning CS on T3, for the fixture Daysimeter between lighting conditions.")
 
 ggplot(T3_fixture_Morning_CS_conditions, aes(x=condition, y=morning_CS, fill = condition)) +
   geom_bar(position=position_dodge(0.9), stat="identity", color="black" ) +
@@ -146,6 +153,9 @@ t.test(morning_CS ~ condition, data = T3_fixture_Morning_CS)
 
 T3_person_Morning_CS <- subset(T3_person_Morning_CS, condition != "unknown")
 T3_person_Morning_CS_conditions <- summarySE(T3_person_Morning_CS, measurevar = "morning_CS", groupvars = c("condition"))
+
+
+kable(T3_person_Morning_CS_conditions, caption = "Mean person CS on T3, for the fixture Daysimeter between lighting conditions.")
 
 
 ggplot(T3_person_Morning_CS_conditions, aes(x=condition, y=morning_CS, fill = condition)) +
