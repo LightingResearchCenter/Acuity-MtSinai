@@ -1,6 +1,7 @@
 library(readxl)
 library(Rmisc)
 library(nlme)
+library(ez)
 
 pd <- position_dodge(0.1) # move them .05 to the left and right
 
@@ -206,6 +207,7 @@ acrophase_model1 <- lme(value ~ condition*variable , random = ~1|subject/variabl
 
 anova(acrophase_model1)
 
+subnums <- data.frame(table(acrophase_data3$subject))
 
 
 t.test(deltaT3 ~ condition, data = acrophase_data2[!is.na(acrophase_data2$deltaT3),])
